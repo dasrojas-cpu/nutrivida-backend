@@ -1,0 +1,957 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "API Nutrivida",
+        "version": "1.0.0",
+        "description": "API REST de servicios nutricionales, usuarios y reservas. Proyecto DSY1104 - Guia 19."
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Servidor Nutrivida"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Autenticacion",
+            "description": "Registro, inicio de sesion y perfil"
+        },
+        {
+            "name": "Servicios",
+            "description": "Catalogo y administracion"
+        },
+        {
+            "name": "Reservas",
+            "description": "Agendamiento e historial propio"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "AutenticacionJWT": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "schemas": {
+            "Credenciales": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "correo",
+                    "contrasena"
+                ],
+                "properties": {
+                    "correo": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255,
+                        "example": "paciente@gmail.com"
+                    },
+                    "contrasena": {
+                        "type": "string",
+                        "format": "password",
+                        "maxLength": 128,
+                        "example": "ContrasenaFicticia2026"
+                    }
+                }
+            },
+            "Usuario": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "nombre": {
+                        "type": "string"
+                    },
+                    "apellido": {
+                        "type": "string"
+                    },
+                    "correo": {
+                        "type": "string"
+                    },
+                    "rol": {
+                        "type": "string",
+                        "enum": [
+                            "paciente",
+                            "administrador"
+                        ]
+                    },
+                    "activo": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "RespuestaError": {
+                "type": "object",
+                "properties": {
+                    "mensaje": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Registro": {
+                "type": "object",
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "example": "Paciente",
+                        "maxLength": 100
+                    },
+                    "apellido": {
+                        "type": "string",
+                        "example": "Prueba",
+                        "maxLength": 100
+                    },
+                    "correo": {
+                        "type": "string",
+                        "example": "paciente@gmail.com",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "contrasena": {
+                        "type": "string",
+                        "example": "ContrasenaFicticia2026",
+                        "format": "password",
+                        "minLength": 15,
+                        "maxLength": 128
+                    }
+                },
+                "required": [
+                    "nombre",
+                    "apellido",
+                    "correo",
+                    "contrasena"
+                ],
+                "additionalProperties": false
+            },
+            "Servicio": {
+                "type": "object",
+                "properties": {
+                    "codigo": {
+                        "type": "string",
+                        "example": "CN001",
+                        "pattern": "^[A-Z0-9]{1,20}$"
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "example": "Consulta",
+                        "maxLength": 100
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Primera consulta nutricional",
+                        "maxLength": 150
+                    },
+                    "duracion": {
+                        "type": "string",
+                        "example": "50 min",
+                        "maxLength": 50
+                    },
+                    "modalidad": {
+                        "type": "string",
+                        "example": "Presencial",
+                        "maxLength": 50
+                    },
+                    "profesional": {
+                        "type": "string",
+                        "example": "Nutricionista",
+                        "maxLength": 100
+                    },
+                    "precio": {
+                        "type": "integer",
+                        "example": 35000,
+                        "minimum": 1,
+                        "maximum": 2147483647
+                    },
+                    "descripcion": {
+                        "type": "string",
+                        "example": "Evaluacion nutricional inicial",
+                        "maxLength": 2000
+                    }
+                },
+                "required": [
+                    "codigo",
+                    "tipo",
+                    "nombre",
+                    "duracion",
+                    "modalidad",
+                    "profesional",
+                    "precio",
+                    "descripcion"
+                ],
+                "additionalProperties": false
+            },
+            "SolicitudReserva": {
+                "type": "object",
+                "properties": {
+                    "codigo_servicio": {
+                        "type": "string",
+                        "example": "CN001",
+                        "pattern": "^[A-Z0-9]{1,20}$"
+                    },
+                    "nutricionista_id": {
+                        "type": "integer",
+                        "example": 1,
+                        "minimum": 1,
+                        "maximum": 2147483647
+                    },
+                    "fecha_reserva": {
+                        "type": "string",
+                        "example": "2026-11-23",
+                        "format": "date"
+                    },
+                    "hora_reserva": {
+                        "type": "string",
+                        "example": "10:30",
+                        "pattern": "^([01][0-9]|2[0-3]):(00|30)$"
+                    }
+                },
+                "required": [
+                    "codigo_servicio",
+                    "nutricionista_id",
+                    "fecha_reserva",
+                    "hora_reserva"
+                ],
+                "additionalProperties": false
+            },
+            "Reserva": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "codigo_servicio": {
+                        "type": "string",
+                        "example": "CN001"
+                    },
+                    "servicio": {
+                        "type": "string",
+                        "example": "Primera consulta nutricional"
+                    },
+                    "nutricionista": {
+                        "type": "string",
+                        "example": "Nutricionista 1"
+                    },
+                    "fecha_reserva": {
+                        "type": "string",
+                        "example": "2026-11-23"
+                    },
+                    "hora_reserva": {
+                        "type": "string",
+                        "example": "10:30"
+                    },
+                    "duracion_minutos": {
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "precio": {
+                        "type": "integer",
+                        "example": 35000
+                    },
+                    "estado": {
+                        "type": "string",
+                        "example": "confirmada"
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Autenticacion"
+                ],
+                "summary": "Iniciar sesion",
+                "description": "Verifica las credenciales y genera un JWT valido durante 30 minutos. Disponible para pacientes y administradores.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Credenciales"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Inicio de sesion correcto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string"
+                                        },
+                                        "accessToken": {
+                                            "type": "string"
+                                        },
+                                        "tokenType": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "expiresIn": {
+                                            "type": "integer",
+                                            "example": 1800
+                                        },
+                                        "usuario": {
+                                            "$ref": "#/components/schemas/Usuario"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos invalidos"
+                    },
+                    "401": {
+                        "description": "Correo o contrasena incorrectos"
+                    },
+                    "429": {
+                        "description": "Limite de intentos superado"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                }
+            }
+        },
+        "/api/auth/me": {
+            "get": {
+                "tags": [
+                    "Autenticacion"
+                ],
+                "summary": "Consultar perfil propio",
+                "description": "Obtiene el usuario autenticado mediante JWT.",
+                "security": [
+                    {
+                        "AutenticacionJWT": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Perfil obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "usuario": {
+                                            "$ref": "#/components/schemas/Usuario"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token ausente, invalido, vencido o cuenta no disponible"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                }
+            }
+        },
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Autenticacion"
+                ],
+                "summary": "Registrar paciente",
+                "description": "Asigna el rol paciente automaticamente. Acepta correos duocuc.cl, profesorduoc.cl y gmail.com. El correo debe ser unico.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Registro"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string",
+                                            "example": "Usuario registrado correctamente"
+                                        },
+                                        "usuario": {
+                                            "$ref": "#/components/schemas/Usuario"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos invalidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto con las reglas del negocio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Limite de intentos superado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/servicios": {
+            "get": {
+                "tags": [
+                    "Servicios"
+                ],
+                "summary": "Consultar catalogo",
+                "description": "Devuelve los servicios activos. Acceso publico.",
+                "responses": {
+                    "200": {
+                        "description": "Catalogo obtenido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Servicio"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Servicios"
+                ],
+                "summary": "Crear servicio",
+                "description": "Solo administrador. Codigo unico, categoria existente y precio entero positivo.",
+                "security": [
+                    {
+                        "AutenticacionJWT": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Servicio"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Servicio creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string",
+                                            "example": "Operacion correcta"
+                                        },
+                                        "servicio": {
+                                            "$ref": "#/components/schemas/Servicio"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos invalidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autenticacion requerida o token invalido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permisos insuficientes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto con las reglas del negocio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/servicios/{codigo}": {
+            "parameters": [
+                {
+                    "name": "codigo",
+                    "in": "path",
+                    "required": true,
+                    "description": "Codigo unico del servicio",
+                    "schema": {
+                        "type": "string",
+                        "example": "CN001",
+                        "minLength": 1,
+                        "maxLength": 20
+                    }
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Servicios"
+                ],
+                "summary": "Consultar detalle",
+                "description": "Consulta publica de un servicio activo.",
+                "responses": {
+                    "200": {
+                        "description": "Servicio encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Servicio"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos invalidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recurso no encontrado o no disponible",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Servicios"
+                ],
+                "summary": "Modificar servicio",
+                "description": "Solo administrador. Debe enviar todos los campos y conservar el codigo original.",
+                "security": [
+                    {
+                        "AutenticacionJWT": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Servicio"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Servicio actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string",
+                                            "example": "Operacion correcta"
+                                        },
+                                        "servicio": {
+                                            "$ref": "#/components/schemas/Servicio"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos invalidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autenticacion requerida o token invalido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permisos insuficientes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recurso no encontrado o no disponible",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Servicios"
+                ],
+                "summary": "Desactivar servicio",
+                "description": "Solo administrador. Eliminacion logica para conservar el historial de reservas.",
+                "security": [
+                    {
+                        "AutenticacionJWT": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Servicio desactivado"
+                    },
+                    "400": {
+                        "description": "Datos invalidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autenticacion requerida o token invalido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permisos insuficientes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recurso no encontrado o no disponible",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reservas": {
+            "post": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Agendar reserva",
+                "description": "Solo paciente. El servidor determina el precio, la identidad y la duracion. Valida horarios, disponibilidad y conflictos de reservas.",
+                "security": [
+                    {
+                        "AutenticacionJWT": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SolicitudReserva"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Reserva creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string",
+                                            "example": "Reserva registrada correctamente"
+                                        },
+                                        "reserva": {
+                                            "$ref": "#/components/schemas/Reserva"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos invalidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autenticacion requerida o token invalido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permisos insuficientes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recurso no encontrado o no disponible",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto con las reglas del negocio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Consultar reservas propias",
+                "description": "El usuario solamente puede consultar sus reservas. La identidad se obtiene del JWT.",
+                "security": [
+                    {
+                        "AutenticacionJWT": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historial obtenido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Reserva"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autenticacion requerida o token invalido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permisos insuficientes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

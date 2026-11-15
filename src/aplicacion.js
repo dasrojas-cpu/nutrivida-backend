@@ -7,6 +7,7 @@ const rutasServicios = require(
 
 const rutasAutenticacion = require('./rutas/autenticacion.rutas');
 const rutasReservas = require('./rutas/reservas.rutas');
+const documentacion = require('./documentacion/swagger');
 const aplicacion = express();
 
 // Configurar los origenes permitidos
@@ -18,6 +19,7 @@ aplicacion.use(cors({
 }));
 
 aplicacion.use(express.json());
+documentacion.configurarDocumentacion(aplicacion);
 
 // Comprobar el funcionamiento de la API
 aplicacion.get('/', (solicitud, respuesta) => {
