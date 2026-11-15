@@ -6,6 +6,7 @@ const rutasServicios = require(
 );
 
 const rutasAutenticacion = require('./rutas/autenticacion.rutas');
+const rutasReservas = require('./rutas/reservas.rutas');
 const aplicacion = express();
 
 // Configurar los origenes permitidos
@@ -28,6 +29,7 @@ aplicacion.get('/', (solicitud, respuesta) => {
 // Rutas del catalogo
 aplicacion.use('/api/servicios', rutasServicios);
 aplicacion.use('/api/auth', rutasAutenticacion);
+aplicacion.use('/api/reservas', rutasReservas);
 
 // Controlar rutas inexistentes
 aplicacion.use((solicitud, respuesta) => {
