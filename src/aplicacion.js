@@ -1,12 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 
-const rutasServicios = require(
-    './rutas/servicios.rutas'
-);
-
+const rutasServicios = require('./rutas/servicios.rutas');
 const rutasAutenticacion = require('./rutas/autenticacion.rutas');
 const rutasReservas = require('./rutas/reservas.rutas');
+const rutasNutricionistas = require('./rutas/nutricionistas.rutas');
+
 const documentacion = require('./documentacion/swagger');
 const aplicacion = express();
 
@@ -19,6 +18,7 @@ aplicacion.use(cors({
 }));
 
 aplicacion.use(express.json());
+
 documentacion.configurarDocumentacion(aplicacion);
 
 // Comprobar el funcionamiento de la API
@@ -28,10 +28,11 @@ aplicacion.get('/', (solicitud, respuesta) => {
     });
 });
 
-// Rutas del catalogo
+// Registrar las rutas de la API
 aplicacion.use('/api/servicios', rutasServicios);
 aplicacion.use('/api/auth', rutasAutenticacion);
 aplicacion.use('/api/reservas', rutasReservas);
+aplicacion.use('/api/nutricionistas', rutasNutricionistas);
 
 // Controlar rutas inexistentes
 aplicacion.use((solicitud, respuesta) => {
