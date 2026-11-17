@@ -23,6 +23,10 @@
         {
             "name": "Reservas",
             "description": "Agendamiento e historial propio"
+        },
+        {
+            "name": "Nutricionistas",
+            "description": "Consulta de profesionales disponibles"
         }
     ],
     "components": {
@@ -254,6 +258,23 @@
                     "estado": {
                         "type": "string",
                         "example": "confirmada"
+                    }
+                }
+            },
+            "Nutricionista": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "nombre"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Nutricionista 1"
                     }
                 }
             }
@@ -936,6 +957,41 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RespuestaError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/nutricionistas": {
+            "get": {
+                "tags": [
+                    "Nutricionistas"
+                ],
+                "summary": "Listar nutricionistas activos",
+                "description": "Obtiene los nutricionistas activos registrados en PostgreSQL. Acceso publico.",
+                "security": [],
+                "responses": {
+                    "200": {
+                        "description": "Nutricionistas obtenidos correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Nutricionista"
+                                    }
                                 }
                             }
                         }

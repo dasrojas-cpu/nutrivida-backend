@@ -9,9 +9,7 @@ async function comprobarDocumentacion() {
 
     console.log('Estructura OpenAPI: APROBADO');
 
-    const metodos = [
-        'get', 'post', 'put', 'delete'
-    ];
+    const metodos = ['get', 'post', 'put', 'delete'];
 
     let operaciones = 0;
 
@@ -21,17 +19,25 @@ async function comprobarDocumentacion() {
         for (const metodo of Object.keys(contenido)) {
 
             if (metodos.includes(metodo)) {
-                console.log(
-                    metodo.toUpperCase(), ruta
-                );
-
+                console.log(metodo.toUpperCase(), ruta);
                 operaciones++;
             }
         }
     }
 
-    comprobar.equal(operaciones, 10);
+    // Comprobar la cantidad de operaciones documentadas
+    comprobar.equal(operaciones, 11);
 
+    // Comprobar la documentacion de nutricionistas
+    const nutricionistas =
+        documento.paths['/api/nutricionistas']?.get;
+
+    comprobar.ok(nutricionistas);
+    comprobar.ok(nutricionistas.responses['200']);
+    comprobar.ok(nutricionistas.responses['500']);
+    comprobar.deepEqual(nutricionistas.security, []);
+
+    console.log('Endpoint nutricionistas: APROBADO');
     console.log('------------------------------');
     console.log('Total de endpoints:', operaciones);
     console.log('Documentacion de API: APROBADO');
