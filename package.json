@@ -4,8 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "node pruebas/tokens.prueba.js && node pruebas/permisos.prueba.js && node pruebas/duracion.prueba.js && node pruebas/horarios.prueba.js && node pruebas/documentacion.prueba.js",
+    "start": "node server.js",
+    "test:integracion": "node pruebas/ejecutarIntegracion.js"
   },
   "keywords": [],
   "author": "",

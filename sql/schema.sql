@@ -55,3 +55,14 @@ VALUES
     ('Nutricionista 4')
 ON CONFLICT DO NOTHING;
 
+
+-- Crear la tabla principal de reservas nutricionales.
+CREATE TABLE IF NOT EXISTS reservas (
+    id SERIAL PRIMARY KEY,
+    nombre_paciente VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) NOT NULL,
+    fecha_reserva DATE NOT NULL,
+    hora_reserva TIME NOT NULL,
+    estado VARCHAR(30) DEFAULT 'Pendiente',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
