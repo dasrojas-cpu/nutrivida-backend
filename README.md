@@ -109,9 +109,9 @@ no perder el historial de reservas.
 
 ### Diagramas
 
-- Diagrama entidad-relacion: pendiente de incorporar enlace Drive.
-- Diagrama de arquitectura: pendiente de incorporar enlace Drive.
-- Diagrama de secuencia JWT: pendiente de incorporar enlace Drive.
+- Diagrama entidad-relacion: [archivo editable](docs/guia19/diagramas/01_Modelo_ER.drawio).
+- Diagrama de arquitectura: [archivo editable](docs/guia19/diagramas/02_Arquitectura.drawio).
+- Diagrama de secuencia JWT: [archivo editable](docs/guia19/diagramas/03_Secuencia_JWT.drawio).
 
 Los archivos deben quedar disponibles para lectura del profesor.
 
@@ -444,8 +444,8 @@ fuera del entorno academico.
 Resultados informados al 19 de noviembre de 2026:
 
 - Backend: 71 casos aprobados.
-- Frontend: 97 de 97 casos aprobados despues de la refactorizacion.
-- Total frontend y backend: 168 casos aprobados.
+- Frontend: 107 de 107 casos aprobados el 20 de noviembre de 2026.
+- Total frontend y backend: 178 casos aprobados.
 - Cobertura de lineas: 75.38%.
 - Cobertura de sentencias: 74.81%.
 - Cobertura de funciones: 68.84%.
